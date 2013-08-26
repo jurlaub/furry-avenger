@@ -51,13 +51,15 @@ def make_Cluster(entry, ClusterList, n):
     #     #create new cluster
     #     # find n from x or y      
     #n = max(entry[1], entry[2])
-    #s = Cluster(n, entry, 0)
+    s = Cluster(n, entry, 0)
 
-    ClusterList.append(Cluster(n, entry, 0))
+    ClusterList.append(s)
     #     #v = ClusterList[0]
     #     #print v.cityList[0]
     #     #v.cityList[0] = ["hello world", 8]
-    #     return
+    #print "this is a new cluster"
+    #print ClusterList
+
 
 
 def add_Cluster(entry, ClusterList):
@@ -69,19 +71,21 @@ def add_Cluster_Entry(entry, ClusterList):
 
     for item in ClusterList:
         z+=1
-        print z
+        # print str(z) + " we are at item"
         x2, y2 = item.x, item.y
         m = distance(x1, y1, x2, y2)
 
-        if(m <=item.n):
-
+        if(m <= item.n):
+            # print item
+            # print str(m) + " this is the distance"
+            # print str(item.n) + " this is n_max"
             #add to the existing cluster which is item
             x2, y2 = item.getLastCityList()
             m = distance(x1, y1, x2, y2)
             item.addCityList([entry, m])
             return True
-        else:
-            print "sorry not included " + str(m)
+        # else:
+        #     print "sorry not included " + str(entry) + " distance: " + str(m)
 
     return False
 
@@ -140,7 +144,7 @@ def input_coords(filename, ClusterList):
         #add in something to skip first line, also first character of each line (the city number)
         first = f.readline()
         n,x,y = first.strip().split(' ')
-        n_max = max(int(x),int(y))
+        n_max = 1700 #max(int(x),int(y))
         entry = (n, x, y)
         make_Cluster(entry, ClusterList, n_max)
 
@@ -150,6 +154,7 @@ def input_coords(filename, ClusterList):
             #print str(n) + "   " + str(x) + "   " + str(y)
             entry = (n, x, y)
             if not add_Cluster_Entry(entry, ClusterList):
+                #print "Make new Cluster"
                 make_Cluster(entry, ClusterList, n_max)
 
             
@@ -177,13 +182,13 @@ def command(filename):
     ClusterList = []
 
     #call input_coords ()
-    ClusterList = input_coords(filename, ClusterList)
+    input_coords(filename, ClusterList)
     m = 0
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
-        print item.cityList
-        print item.getLastCityList() 
+        print str(item.cityList)
+        #print item.getLastCityList() 
 
 
 
