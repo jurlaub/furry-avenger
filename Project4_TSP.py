@@ -22,8 +22,14 @@ class Cluster():
         self.y = node[2]
         self.cityList.append([node, distance])
 
-    def addCityList(val):
+    def addCityList(self,val):
         self.cityList.append(val)
+
+    def getCoord(self):
+        return self.x, self.y
+
+    def getCityList(sel f):
+        return self.cityList
 
 
 
@@ -44,7 +50,9 @@ def make_add_Cluster(entry, ClusterList):
         # find n from x or y      
         n = max(entry[1], entry[2])
         print n
-        ClusterList.append(Cluster(n, entry, 0))
+        s = Cluster(n, entry, 0)
+
+        ClusterList.append(s)
         #v = ClusterList[0]
         #print v.cityList[0]
         #v.cityList[0] = ["hello world", 8]
@@ -53,13 +61,14 @@ def make_add_Cluster(entry, ClusterList):
     x1, y1 = entry[1], entry[2]
 
     for item in ClusterList:
-        # x2, y2 = item.x, item.y
+        x2, y2 = item.x, item.y
+
         # print x2
         # print y2
-        print item.cityList[0]
+        print item.cityList 
 
 
-    ClusterList.append(entry)
+    #ClusterList.append(entry)
 
 
 
@@ -116,7 +125,7 @@ def command(filename):
     #call input_coords ()
     ClusterList = input_coords(filename, ClusterList)
 
-    #print ClusterList
+    print ClusterList
 
 
  
