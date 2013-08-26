@@ -10,20 +10,23 @@ class Cluster():
     #  n
     # 
     #list of tuples, distances 
-    x = 0
-    y = 0
-    nearNeighbor = []
-    cityList = []
-    length = 0
+    # x = 0
+    # y = 0
+    # length = 0
 
-    def __init__(self, n, node, distance):
+    def __init__(self, n, x, y):
         self.n = int(n)
-        self.x = int(node[1])
-        self.y = int(node[2])
-        self.cityList.append([node, distance])
+        self.x = int(x)
+        self.y = int(y)
+        self.nearestNeighbers = []
+        self.cityList = []
+        self.length = 0
+    
+        #self.cityList.append([node, distance])
 
     def addCityList(self,val):
         self.cityList.append(val)
+        #self.cityList[0] = val
 
     def getCoord(self):
         return self.x, self.y
@@ -51,7 +54,8 @@ def make_Cluster(entry, ClusterList, n):
     #     #create new cluster
     #     # find n from x or y      
     #n = max(entry[1], entry[2])
-    s = Cluster(n, entry, 0)
+    s = Cluster(n, entry[1], entry[2])
+    s.addCityList([entry, 0])
 
     ClusterList.append(s)
     #     #v = ClusterList[0]
@@ -82,6 +86,7 @@ def add_Cluster_Entry(entry, ClusterList):
             #add to the existing cluster which is item
             x2, y2 = item.getLastCityList()
             m = distance(x1, y1, x2, y2)
+            #item.cityList.append([entry, m])
             item.addCityList([entry, m])
             return True
         # else:
@@ -187,8 +192,13 @@ def command(filename):
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
-        print str(item.cityList)
+        print item.getCityList()
+        # print " next round +++++++++++++++"
+        # for entry in item.getCityList():
+        #     print entry
         #print item.getLastCityList() 
+    #print ClusterList
+
 
 
 
