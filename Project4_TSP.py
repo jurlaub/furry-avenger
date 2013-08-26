@@ -39,16 +39,20 @@ class Cluster():
     def getLastCityList(self):
         return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2]), int(self.cityList[-1][1])
 
+    def getLastCityDistance(self):
+        return int(self.cityList[-1][1])
 
 # input:  filename, ordered list with length
 # output: filename.tour ; 1st line "tour length: #" ; list of city ids
 #
 def print_to_file(filename, length, list):
+
     pass
 
 
-
-
+# 
+def neighbor_list():
+    pass
 
 
 #calculates the nearest 3 neighbors
@@ -59,7 +63,33 @@ def cluster_citysort(cluster):
 
     a = cluster.getCityList()
     a.sort(key = lambda c: c[0][1] )
-    
+
+def cluster_city_bruteforce(cluster):
+
+    cities = cluster.getCityList()
+    citiesCopy = []
+    tourtotal = cluster.getLastCityDistance()
+    subtotal = []
+    counter = 0
+
+    for index in cities:
+        counter+=1
+        # grab item xy
+        x1, y1, m1 = index[0][1], index[0][2], index[1]
+        print str(x1) + ' ' + str(y1) + ' outer loop'
+        #for loop
+        for runner in cities[counter:]:
+            #print "     " + str(runner)
+            # if not the same find distance
+            x2, y2 = runner[0][1], runner[0][2]
+            m2 = distance(x1, y1, x2, y2) 
+            subtotal.append(m2)
+            # subtotal > tourtotal, try new option
+            #   continue searching
+        
+
+
+
 
 def cluster_sort(cluster):
     pass
@@ -160,6 +190,7 @@ def myTour(matrix, tour):
 def command(filename):
 
     ClusterList = []
+    NeighborList = []
 
     #call input_coords ()
     input_coords(filename, ClusterList)
@@ -167,9 +198,10 @@ def command(filename):
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
-        print item.getCityList()
+        print cluster_city_bruteforce(item)
+        #print item.getCityList()
         #cluster_citysort(item)
-        print item.getCityList()
+        #print item.getCityList()
         # print " next round +++++++++++++++"
         # for entry in item.getCityList():
         #     print entry
@@ -177,6 +209,21 @@ def command(filename):
     #print ClusterList
 
 
+    # call sort: neighbor and cluster
+    # seperate list of neighbor clusters
+
+    #sort within clusters
+    #find closest point from cluster to neighbor clusters
+
+    # Refine (OPT)
+    #   neighbor cluster list
+    #       newCLusterList 
+
+    #print out
+    #   follow neighbor cluster list
+    #   print into list each point in cluster, iteratively
+
+    # write to file
 
 
 
