@@ -1,6 +1,7 @@
 import math
 import sys
 import getopt
+import os.path
 
 
 
@@ -22,14 +23,19 @@ def distance_matrix(coordinates):
 def input_coords(filename):
     '''This function reads city coordinates from a text file'''
     runningList = []
-    with open(filename) as f:
+    fi = open(filename)
+    with fi as f:
         #add in something to skip first line, also first character of each line (the city number)
         for line in f.readlines():
             n,x,y = line.strip().split(' ')
             #coordinates.append((float(x), float(y)))
             print str(n) + "   " + str(x) + "   " + str(y)
             entry = (n, x, y)
+
+            #call distance function
+
             runningList.append(entry)
+    fi.close()
     return runningList
 
 
@@ -43,7 +49,12 @@ def myTour(matrix, tour):
         total += matrix[city_i, city_j]
     return total
             
-  
+
+
+
+
+
+ 
 
 def main():
     #parse command line options
@@ -56,20 +67,17 @@ def main():
     #process options
     for o, a in opts:
         if o in ("-h", "--help"):
-            print __doc__
+            print "Project4_TSP.py <filename>"
             sys.exit(0)
     # process args
     for arg in args:
         process(arg) # process() somewhere
 
+
 def process(arg):
     try:
-        fh = open(arg, "r")
-        print fh
-        print "it worked?"
-        fh.close()
-
-        print input_coords(arg)
+        if os.path.exists(arg):
+            print input_coords(arg)
 
     except IOError as e:
         print("({})".format(e))
