@@ -40,6 +40,17 @@ class Cluster():
         return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2]), int(self.cityList[-1][1])
 
 
+# input:  filename, ordered list with length
+# output: filename.tour ; 1st line "tour length: #" ; list of city ids
+#
+def print_to_file(filename, length, list):
+    pass
+
+
+
+
+
+
 #calculates the nearest 3 neighbors
 def cluster_neighbor():
     pass
@@ -51,7 +62,7 @@ def cluster_citysort(cluster):
     
 
 def cluster_sort(cluster):
-    a = cluster.
+    pass
 
 def distance(x1, y1, x2, y2):
     dx = x1 - x2
@@ -91,11 +102,11 @@ def add_Cluster_Entry(entry, ClusterList):
             # print str(m) + " this is the distance"
             # print str(item.n) + " this is n_max"
             #add to the existing cluster which is item
-            #x2, y2, m2 = item.getLastCityList()
-            #m = distance(x1, y1, x2, y2)
+            x2, y2, m2 = item.getLastCityList()
+            m = distance(x1, y1, x2, y2)
             #item.cityList.append([entry, m])
             #item.addCityList(entry, m, x1, y1)
-            item.addCityList([entry, m])
+            item.addCityList([entry, m+m2])
             return True
         # else:
         #     print "sorry not included " + str(entry) + " distance: " + str(m)
@@ -157,7 +168,7 @@ def command(filename):
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
         print item.getCityList()
-        cluster_citysort(item)
+        #cluster_citysort(item)
         print item.getCityList()
         # print " next round +++++++++++++++"
         # for entry in item.getCityList():
