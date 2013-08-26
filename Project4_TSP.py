@@ -4,7 +4,8 @@ import getopt
 import os.path
 import random
 
-
+#            intdex [0][n],        index[1]    ,    index[2]
+#  city_entry = [(tuple), distance to prev city, distance running total]
 class Cluster():
     # nearestNeighbers
     # Cluster Max-Length
@@ -28,7 +29,9 @@ class Cluster():
     #def addCityList(self, entry, m, x1, y1):
     def addCityList(self, val):
         self.cityList.append(val)
-      
+    
+    def replaceCityList(self, val):
+        self.cityList = val 
 
     def getCoord(self):
         return self.x, self.y
@@ -37,10 +40,10 @@ class Cluster():
         return self.cityList
 
     def getLastCityList(self):
-        return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2]), int(self.cityList[-1][1])
+        return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2]), int(self.cityList[-1][2])
 
     def getLastCityDistance(self):
-        return int(self.cityList[-1][1])
+        return int(self.cityList[-1][2])
 
 # input:  filename, ordered list with length
 # output: filename.tour ; 1st line "tour length: #" ; list of city ids
@@ -64,28 +67,70 @@ def cluster_citysort(cluster):
     a = cluster.getCityList()
     a.sort(key = lambda c: c[0][1] )
 
+
+
 def cluster_city_bruteforce(cluster):
 
     cities = cluster.getCityList()
-    citiesCopy = []
-    tourtotal = cluster.getLastCityDistance()
+    citiesSorted = []
     subtotal = []
-    counter = 0
+    tourtotal = cluster.getLastCityDistance()
+    
 
-    for index in cities:
-        counter+=1
-        # grab item xy
-        x1, y1, m1 = index[0][1], index[0][2], index[1]
-        print str(x1) + ' ' + str(y1) + ' outer loop'
-        #for loop
-        for runner in cities[counter:]:
-            #print "     " + str(runner)
-            # if not the same find distance
-            x2, y2 = runner[0][1], runner[0][2]
+
+
+    # obtain the last item from current cities (i.e. not parent item)
+    #   place into new list in order to do the search sequence
+    if cities:
+        tmp = cities.pop(-1)
+        tmp[1] = 0
+        tmp[2] = 0
+        citiesSorted.append(tmp)
+
+    
+
+    # Iterate through copied list, comparing the distances to items 
+    #   in the original list, append the closest to the copied list
+    for index in citiesSorted:
+        #            intdex [0][n],        index[1]    ,    index[2]
+        #  city_entry = [(tuple), distance to prev city, distance running total]
+        x1, y1, t1 = int(index[0][1]), int(index[0][2]), int(index[2])
+
+        minDistance = tourtotal
+        minIndex = 0
+        counter = 0
+
+        for runner in cities:
+
+            x2, y2 = int(runner[0][1]), int(runner[0][2])
             m2 = distance(x1, y1, x2, y2) 
-            subtotal.append(m2)
-            # subtotal > tourtotal, try new option
-            #   continue searching
+            if(m2 <= minDistance):
+                minIndex = counter
+                minDistance = m2
+
+            counter+=1
+
+        if cities:
+            tmp = cities.pop(minIndex)
+            tmp[1] = minDistance
+            tmp[2] = t1 + minDistance
+            citiesSorted.append(tmp)
+    return citiesSorted
+
+    # for index in cities:
+    #     counter+=1
+    #     # grab item xy
+    #     x1, y1, m1 = index[0][1], index[0][2], index[1]
+    #     print str(x1) + ' ' + str(y1) + ' outer loop'
+    #     #for loop
+    #     for runner in cities[counter:]:
+    #         #print "     " + str(runner)
+    #         # if not the same find distance
+    #         x2, y2 = runner[0][1], runner[0][2]
+    #         m2 = distance(x1, y1, x2, y2) 
+    #         subtotal.append(m2)
+    #         # subtotal > tourtotal, try new option
+    #         #   continue searching
         
 
 
@@ -106,7 +151,7 @@ def make_Cluster(entry, ClusterList, n):
     #     # find n from x or y      
     #n = max(entry[1], entry[2])
     s = Cluster(n, entry[1], entry[2])
-    s.addCityList([entry, 0])
+    s.addCityList([entry, 0, 0])
 
     ClusterList.append(s)
     #     #v = ClusterList[0]
@@ -136,7 +181,7 @@ def add_Cluster_Entry(entry, ClusterList):
             m = distance(x1, y1, x2, y2)
             #item.cityList.append([entry, m])
             #item.addCityList(entry, m, x1, y1)
-            item.addCityList([entry, m+m2])
+            item.addCityList([entry, m, m+m2])
             return True
         # else:
         #     print "sorry not included " + str(entry) + " distance: " + str(m)
@@ -198,10 +243,11 @@ def command(filename):
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
-        print cluster_city_bruteforce(item)
-        #print item.getCityList()
+        #print cluster_city_bruteforce(item)
+        print item.getCityList()
+        item.replaceCityList(cluster_city_bruteforce(item))
         #cluster_citysort(item)
-        #print item.getCityList()
+        print item.getCityList()
         # print " next round +++++++++++++++"
         # for entry in item.getCityList():
         #     print entry
