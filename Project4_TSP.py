@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 import sys
 import getopt
 import os.path
@@ -17,9 +17,9 @@ class Cluster():
     length = 0
 
     def __init__(self, n, node, distance):
-        self.n = n
-        self.x = node[1]
-        self.y = node[2]
+        self.n = int(n)
+        self.x = int(node[1])
+        self.y = int(node[2])
         self.cityList.append([node, distance])
 
     def addCityList(self,val):
@@ -28,13 +28,27 @@ class Cluster():
     def getCoord(self):
         return self.x, self.y
 
-    def getCityList(sel f):
+    def getCityList(self):
         return self.cityList
 
+    def getLastCityList(self):
+        return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2])
 
 
 
+def distance(x1, y1, x2, y2):
+    dx = x1 - x2
+    dy = y1 - y2
+    return int(sqrt(dx*dx + dy*dy))   
 
+
+
+def make_Cluster(entry, ClusterList):
+
+    pass
+
+def add_Cluster(entry, ClusterList):
+    pass
 # pass in distance (n from parentnode), 
 # list of clusters
 # 
@@ -49,7 +63,6 @@ def make_add_Cluster(entry, ClusterList):
         #create new cluster
         # find n from x or y      
         n = max(entry[1], entry[2])
-        print n
         s = Cluster(n, entry, 0)
 
         ClusterList.append(s)
@@ -58,32 +71,29 @@ def make_add_Cluster(entry, ClusterList):
         #v.cityList[0] = ["hello world", 8]
         return
 
-    x1, y1 = entry[1], entry[2]
+    x1, y1 = int(entry[1]), int(entry[2])
+    z = 0
 
     for item in ClusterList:
+        z+=1
+        print z
         x2, y2 = item.x, item.y
+        m = distance(x1, y1, x2, y2)
+        if(m <=item.n):
+            #add to the existing cluster which is item
+            x2, y2 = item.getLastCityList()
+            m = distance(x1, y1, x2, y2)
+            item.addCityList([entry, m])
+            return
+        else:
+            print "sorry not included " + str(m)
 
-        # print x2
-        # print y2
-        print item.cityList 
-
+    # n = ClusterList[0].n
+    # ClusterList.append(Cluster(n, entry, 0))
 
     #ClusterList.append(entry)
 
 
-
-def distance_matrix(coordinates):
-    '''This function generates a matrix of distances from the two city coordinates
-      These are euclidean distances. Distances are rounded to the nearest
-      integer. Returns the distance between the two cities'''
-    matrix = {}
-    for i, (x1, y1) in enumerate(coordinates):          #first city's coordinates 
-        for j, (x2, y2) in enumerate(coordinates):      #second city's coordinates
-            dx = x1-x2
-            dy = y1-y2
-            distance = int(sqrt(dx*dx + dy*dy))         #calculate distance using pythagorean theorem
-            matrix[i, j] = distance 
-    return distance
 
 
 def input_coords(filename, ClusterList):
@@ -125,7 +135,7 @@ def command(filename):
     #call input_coords ()
     ClusterList = input_coords(filename, ClusterList)
 
-    print ClusterList
+    print ClusterList[0].getCityList()
 
 
  
