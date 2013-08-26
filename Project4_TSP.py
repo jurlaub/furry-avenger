@@ -2,6 +2,7 @@ from math import sqrt
 import sys
 import getopt
 import os.path
+import random
 
 
 class Cluster():
@@ -24,9 +25,10 @@ class Cluster():
     
         #self.cityList.append([node, distance])
 
-    def addCityList(self,val):
+    #def addCityList(self, entry, m, x1, y1):
+    def addCityList(self, val):
         self.cityList.append(val)
-        #self.cityList[0] = val
+      
 
     def getCoord(self):
         return self.x, self.y
@@ -35,18 +37,26 @@ class Cluster():
         return self.cityList
 
     def getLastCityList(self):
-        return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2])
+        return int(self.cityList[-1][0][1]), int(self.cityList[-1][0][2]), int(self.cityList[-1][1])
 
 
+#calculates the nearest 3 neighbors
+def cluster_neighbor():
+    pass
+
+def cluster_citysort(cluster):
+
+    a = cluster.getCityList()
+    a.sort(key = lambda c: c[0][1] )
+    
+
+def cluster_sort(cluster):
+    a = cluster.
 
 def distance(x1, y1, x2, y2):
     dx = x1 - x2
     dy = y1 - y2
     return int(sqrt(dx*dx + dy*dy))   
-
-
-def first_Cluster():
-    pass
 
 
 def make_Cluster(entry, ClusterList, n):
@@ -66,9 +76,6 @@ def make_Cluster(entry, ClusterList, n):
 
 
 
-def add_Cluster(entry, ClusterList):
-    print entry
-
 def add_Cluster_Entry(entry, ClusterList):
     x1, y1 = int(entry[1]), int(entry[2])
     z = 0
@@ -76,7 +83,7 @@ def add_Cluster_Entry(entry, ClusterList):
     for item in ClusterList:
         z+=1
         # print str(z) + " we are at item"
-        x2, y2 = item.x, item.y
+        x2, y2 = item.getCoord() #item.x, item.y
         m = distance(x1, y1, x2, y2)
 
         if(m <= item.n):
@@ -84,9 +91,10 @@ def add_Cluster_Entry(entry, ClusterList):
             # print str(m) + " this is the distance"
             # print str(item.n) + " this is n_max"
             #add to the existing cluster which is item
-            x2, y2 = item.getLastCityList()
-            m = distance(x1, y1, x2, y2)
+            #x2, y2, m2 = item.getLastCityList()
+            #m = distance(x1, y1, x2, y2)
             #item.cityList.append([entry, m])
+            #item.addCityList(entry, m, x1, y1)
             item.addCityList([entry, m])
             return True
         # else:
@@ -94,50 +102,6 @@ def add_Cluster_Entry(entry, ClusterList):
 
     return False
 
-
-# pass in distance (n from parentnode), 
-# list of clusters
-# 
-def make_add_Cluster(entry, ClusterList):
-
-    # look at list of clusters
-    # current node: find distance from each cluster parent node, 
-    # if within n, add 
-    # if not make new cluster
-
-    # if not ClusterList:
-    #     #create new cluster
-    #     # find n from x or y      
-    #     n = max(entry[1], entry[2])
-    #     s = Cluster(n, entry, 0)
-
-    #     ClusterList.append(s)
-    #     #v = ClusterList[0]
-    #     #print v.cityList[0]
-    #     #v.cityList[0] = ["hello world", 8]
-    #     return
-
-    x1, y1 = int(entry[1]), int(entry[2])
-    z = 0
-
-    for item in ClusterList:
-        z+=1
-        print z
-        x2, y2 = item.x, item.y
-        m = distance(x1, y1, x2, y2)
-        if(m <=item.n):
-            #add to the existing cluster which is item
-            x2, y2 = item.getLastCityList()
-            m = distance(x1, y1, x2, y2)
-            item.addCityList([entry, m])
-            return
-
-            #print "sorry not included " + str(m)
-
-    # n = ClusterList[0].n
-    # ClusterList.append(Cluster(n, entry, 0))
-
-    #ClusterList.append(entry)
 
 
 
@@ -149,7 +113,7 @@ def input_coords(filename, ClusterList):
         #add in something to skip first line, also first character of each line (the city number)
         first = f.readline()
         n,x,y = first.strip().split(' ')
-        n_max = 1700 #max(int(x),int(y))
+        n_max = 2500 #(max(int(x),int(y)))
         entry = (n, x, y)
         make_Cluster(entry, ClusterList, n_max)
 
@@ -192,6 +156,8 @@ def command(filename):
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.x) + " " + str(item.y)
+        print item.getCityList()
+        cluster_citysort(item)
         print item.getCityList()
         # print " next round +++++++++++++++"
         # for entry in item.getCityList():
