@@ -42,13 +42,50 @@ def distance(x1, y1, x2, y2):
     return int(sqrt(dx*dx + dy*dy))   
 
 
-
-def make_Cluster(entry, ClusterList):
-
+def first_Cluster():
     pass
+
+
+def make_Cluster(entry, ClusterList, n):
+    # if not ClusterList:
+    #     #create new cluster
+    #     # find n from x or y      
+    #n = max(entry[1], entry[2])
+    #s = Cluster(n, entry, 0)
+
+    ClusterList.append(Cluster(n, entry, 0))
+    #     #v = ClusterList[0]
+    #     #print v.cityList[0]
+    #     #v.cityList[0] = ["hello world", 8]
+    #     return
+
 
 def add_Cluster(entry, ClusterList):
-    pass
+    print entry
+
+def add_Cluster_Entry(entry, ClusterList):
+    x1, y1 = int(entry[1]), int(entry[2])
+    z = 0
+
+    for item in ClusterList:
+        z+=1
+        print z
+        x2, y2 = item.x, item.y
+        m = distance(x1, y1, x2, y2)
+
+        if(m <=item.n):
+
+            #add to the existing cluster which is item
+            x2, y2 = item.getLastCityList()
+            m = distance(x1, y1, x2, y2)
+            item.addCityList([entry, m])
+            return True
+        else:
+            print "sorry not included " + str(m)
+
+    return False
+
+
 # pass in distance (n from parentnode), 
 # list of clusters
 # 
@@ -59,17 +96,17 @@ def make_add_Cluster(entry, ClusterList):
     # if within n, add 
     # if not make new cluster
 
-    if not ClusterList:
-        #create new cluster
-        # find n from x or y      
-        n = max(entry[1], entry[2])
-        s = Cluster(n, entry, 0)
+    # if not ClusterList:
+    #     #create new cluster
+    #     # find n from x or y      
+    #     n = max(entry[1], entry[2])
+    #     s = Cluster(n, entry, 0)
 
-        ClusterList.append(s)
-        #v = ClusterList[0]
-        #print v.cityList[0]
-        #v.cityList[0] = ["hello world", 8]
-        return
+    #     ClusterList.append(s)
+    #     #v = ClusterList[0]
+    #     #print v.cityList[0]
+    #     #v.cityList[0] = ["hello world", 8]
+    #     return
 
     x1, y1 = int(entry[1]), int(entry[2])
     z = 0
@@ -85,14 +122,13 @@ def make_add_Cluster(entry, ClusterList):
             m = distance(x1, y1, x2, y2)
             item.addCityList([entry, m])
             return
-        else:
-            print "sorry not included " + str(m)
+
+            #print "sorry not included " + str(m)
 
     # n = ClusterList[0].n
     # ClusterList.append(Cluster(n, entry, 0))
 
     #ClusterList.append(entry)
-
 
 
 
@@ -102,15 +138,23 @@ def input_coords(filename, ClusterList):
     fi = open(filename)   
     with fi as f:
         #add in something to skip first line, also first character of each line (the city number)
-    
+        first = f.readline()
+        n,x,y = first.strip().split(' ')
+        n_max = max(int(x),int(y))
+        entry = (n, x, y)
+        make_Cluster(entry, ClusterList, n_max)
+
         for line in f.readlines():
             n,x,y = line.strip().split(' ')
             #coordinates.append((float(x), float(y)))
             #print str(n) + "   " + str(x) + "   " + str(y)
             entry = (n, x, y)
+            if not add_Cluster_Entry(entry, ClusterList):
+                make_Cluster(entry, ClusterList, n_max)
 
+            
             #call make_add_Cluster()
-            make_add_Cluster(entry, ClusterList)
+            # make_add_Cluster(entry, ClusterList)
 
             #ClusterList.append(entry)
     fi.close()
@@ -134,11 +178,19 @@ def command(filename):
 
     #call input_coords ()
     ClusterList = input_coords(filename, ClusterList)
+    m = 0
+    for item in ClusterList:
+        m+=1
+        print str(m) + " " + str(item.x) + " " + str(item.y)
+        print item.cityList
+        print item.getLastCityList() 
 
-    print ClusterList[0].getCityList()
 
 
- 
+
+
+#_______________________________ main________________
+
 
 def main():
     #parse command line options
