@@ -1,4 +1,7 @@
 import math
+import sys
+import getopt
+
 
 class TSP:
 
@@ -23,7 +26,8 @@ class TSP:
             #add in something to skip first line, also first character of each line (the city number)
             for line in f.readlines():
                 n,x,y = line.strip().split(' ')
-                coordinates.append((float(x), float(y)))
+                #coordinates.append((float(x), float(y)))
+                print str(n) + " " + str(x) + " " + str(y)
         return coordinates
 
 
@@ -37,8 +41,36 @@ class TSP:
             total += matrix[city_i, city_j]
         return total
             
-        
+  
+
+def main():
+    #parse command line options
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
+    except getopt.error, msg:
+        print msg
+        print "for help use --help"
+        sys.exit(2)
+    #process options
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            print __doc__
+            sys.exit(0)
+    # process args
+    for arg in args:
+        process(arg) # process() somewhere
+
+def process(arg):
+    try:
+        fh = open(arg)
+    except IOError as e:
+        print("({})".format(e))
+
+    if arg == "dd":
+        print "still need to implement"
+
     
+   
 if __name__ == "__main__":
     main()                                   
         
