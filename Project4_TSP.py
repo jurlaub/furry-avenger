@@ -16,7 +16,8 @@ class Cluster():
     # y = 0
     # length = 0
 
-    def __init__(self, n, x, y):
+    def __init__(self, n, x, y, ident):
+        self.ident = ident
         self.n = int(n)
         self.x = int(x)
         self.y = int(y)
@@ -34,6 +35,9 @@ class Cluster():
     
     def replaceCityList(self, val):
         self.cityList = val 
+
+    def getIdent(self):
+        return self.ident 
 
     def getParentDistanceStats(self):
         return self.distanceToNeighbor, self.distanceRunningTotal
@@ -62,10 +66,16 @@ def print_to_file(filename, length, list):
     pass
 
 
-# 
+# input: ClusterList - a list of cluster objects
+# output: a sorted list of objects using parent nodes for distance
+#           update cluster's neighbor list, 
+#           if current cluster not in neighbor list - add
 def neighbor_list_bruteforce(ClusterList):
     
     Cluster_Sorted = []
+
+    
+
 
 
     #for item in clusterlist
@@ -74,10 +84,25 @@ def neighbor_list_bruteforce(ClusterList):
     if ClusterList:
         tmp = ClusterList.pop()
         tmp_d, tourtotal = tmp.getParentDistanceStats()
+        
+        #size of neighbors
+        list_size = len(ClusterList)
+        N_TEST = int(list_size * .15)
+
+        # actively adding node to neighbor list
+        # when finished extend neighbor list in cluster
+        neighbors = []
+        max_neighbor = tourtotal
+
+        # while searching: increment when element is added
+        n_count = 0
+
         # set values to 0
         tmp.setParentDistanceStats( 0, 0)
 
         Cluster_Sorted.append(tmp)
+
+
 
 
     for index in Cluster_Sorted:
@@ -99,6 +124,14 @@ def neighbor_list_bruteforce(ClusterList):
             if(m2 <= minDistance):
                 minIndex = counter
                 minDistance = m2
+
+            if m2 < max_neighbor:
+
+                if n_count < N_TEST:
+                    neighbors.append([runner.getIdent, m2])
+                    n_count+=1
+                else:
+                    
 
             counter+=1
 
@@ -207,8 +240,9 @@ def make_Cluster(entry, ClusterList, n):
     #n = max(entry[1], entry[2])
 
     x1, y1 = int(entry[1]), int(entry[2])
+    ident = int(entry[0])
 
-    s = Cluster(n, x1, y1 )
+    s = Cluster(n, x1, y1, ident)
     s.addCityList([entry, 0, 0])
 
     if ClusterList:
