@@ -23,6 +23,8 @@ class Cluster():
         self.nearestNeighbers = []
         self.cityList = []
         self.length = 0
+        self.distanceToNeighbor = 0
+        self.distanceRunningTotal = 0
     
         #self.cityList.append([node, distance])
 
@@ -32,6 +34,13 @@ class Cluster():
     
     def replaceCityList(self, val):
         self.cityList = val 
+
+    def getParentDistanceStats(self):
+        return self.distanceToNeighbor, self.distanceRunningTotal
+
+    def setParentDistanceStats(self, toNeighbor, runTotal):
+        self.distanceToNeighbor = toNeighbor
+        self.distanceRunningTotal = runTotal
 
     def getCoord(self):
         return self.x, self.y
@@ -54,12 +63,58 @@ def print_to_file(filename, length, list):
 
 
 # 
-def neighbor_list():
-    pass
+def neighbor_list_bruteforce(ClusterList):
+    
+    Cluster_Sorted = []
+
+
+    #for item in clusterlist
+    #   
+
+    if ClusterList:
+        tmp = ClusterList.pop()
+        tmp_d, tourtotal = tmp.getParentDistanceStats()
+        # set values to 0
+        tmp.setParentDistanceStats( 0, 0)
+
+        Cluster_Sorted.append(tmp)
+
+
+    for index in Cluster_Sorted:
+
+        # coordinates for the index cluster
+        x1, y1 = index.getCoord()
+
+        # d_n is not needed, t1 is running total
+        d_n, t1 = index.getParentDistanceStats()
+
+        minDistance = tourtotal
+        minIndex = 0
+        counter = 0
+
+        for runner in ClusterList:
+
+            x2, y2 = runner.getCoord()
+            m2 = distance(x1, y1, x2, y2) 
+            if(m2 <= minDistance):
+                minIndex = counter
+                minDistance = m2
+
+            counter+=1
+
+        if ClusterList:
+            tmp = ClusterList.pop(minIndex)
+        
+            #update                (distanceToNeighbor, distanceRunningTotal )
+            tmp.setParentDistanceStats( minDistance, t1 + minDistance)
+
+            Cluster_Sorted.append(tmp)
+
+    return Cluster_Sorted
 
 
 #calculates the nearest 3 neighbors
-def cluster_neighbor():
+def cluster_neighbor(ClusterList):
     pass
 
 def cluster_citysort(cluster):
@@ -150,8 +205,19 @@ def make_Cluster(entry, ClusterList, n):
     #     #create new cluster
     #     # find n from x or y      
     #n = max(entry[1], entry[2])
-    s = Cluster(n, entry[1], entry[2])
+
+    x1, y1 = int(entry[1]), int(entry[2])
+
+    s = Cluster(n, x1, y1 )
     s.addCityList([entry, 0, 0])
+
+    if ClusterList:
+        p_d, p_rt = ClusterList[-1].getParentDistanceStats()
+        x2, y2 = ClusterList[-1].getCoord()
+        # get distance
+        m2 = distance(x1, y1, x2, y2)
+        s.setParentDistanceStats(m2, m2+p_rt)
+
 
     ClusterList.append(s)
     #     #v = ClusterList[0]
@@ -184,7 +250,7 @@ def add_Cluster_Entry(entry, ClusterList):
             item.addCityList([entry, m, m+m2])
             return True
         # else:
-        #     print "sorry not included " + str(entry) + " distance: " + str(m)
+        #     print "sorry not included " + str(entry) + "       distance: " + str(m)
 
     return False
 
@@ -242,17 +308,27 @@ def command(filename):
     m = 0
     for item in ClusterList:
         m+=1
-        print str(m) + " " + str(item.x) + " " + str(item.y)
-        #print cluster_city_bruteforce(item)
-        print item.getCityList()
-        item.replaceCityList(cluster_city_bruteforce(item))
-        #cluster_citysort(item)
-        print item.getCityList()
-        # print " next round +++++++++++++++"
+        #print str(m) + " " + str(item.x) + " " + str(item.y)
+        print m
+        print item.getParentDistanceStats()
+        #print item.getCityList()
+        #item.replaceCityList(cluster_city_bruteforce(item))
+
+        #print item.getCityList()
+
         # for entry in item.getCityList():
         #     print entry
         #print item.getLastCityList() 
     #print ClusterList
+
+    ClusterList = neighbor_list_bruteforce(ClusterList)
+    print ")_)(_)(_)(_)(_)(_)(_)(_)(_)(_(_"
+    m = 0
+    for item in ClusterList:
+        m+=1
+        #print str(m) + " " + str(item.x) + " " + str(item.y)
+        print m
+        print item.getParentDistanceStats()
 
 
     # call sort: neighbor and cluster
