@@ -38,7 +38,7 @@ class Cluster():
         return self.nearestNeighbers
 
     def existsNearestNeighbor(self, val):
-        if val in self.nearestNeighbers:
+        if val in [x[0] for x in self.nearestNeighbers]:
             return True
         else:
             return False
@@ -155,7 +155,9 @@ def neighbor_list_bruteforce(ClusterList):
 
         if ClusterList:
             tmp = ClusterList.pop(minIndex)
-        
+            
+            cluster_neighbor_update(tmp, neighbors, Cluster_Sorted)
+
             #update                (distanceToNeighbor, distanceRunningTotal )
             tmp.setParentDistanceStats( minDistance, t1 + minDistance)
             tmp.setNearestNeighbor(neighbors)
@@ -179,10 +181,26 @@ def neighbor_list_bruteforce(ClusterList):
 def cluster_neighbor_update(tmp, neighbors, Cluster_Sorted):
 
     if Cluster_Sorted and neighbors:
+        t = tmp.getParent()
+        x1, y1 = tmp.getCoord()
+        print str(t) + " >>> entry parent"
+        print neighbors
         for entry in neighbors:
+            
+            print entry
             for cluster in Cluster_Sorted:
+                print cluster
+                print cluster.getNearestNeighbor()
 
                 if not cluster.existsNearestNeighbor(entry[0]):
+
+                    x2, y2 = cluster.getCoord()
+                    m2 = distance(x1, y1, x2, y2) 
+                    z = [t, m2]
+                    print z
+                    cluster.setNearestNeighbor(z)
+                    print cluster.getNearestNeighbor()
+
 
 
 
