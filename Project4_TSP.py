@@ -3,18 +3,11 @@ import sys
 import getopt
 import os.path
 import random
+import operator
 
 #            intdex [0][n],        index[1]    ,    index[2]
 #  city_entry = [(tuple), distance to prev city, distance running total]
 class Cluster():
-    # nearestNeighbers
-    # Cluster Max-Length
-    #  n
-    # 
-    #list of tuples, distances 
-    # x = 0
-    # y = 0
-    # length = 0
 
     def __init__(self, n, x, y, ident):
         self.ident = ident
@@ -27,7 +20,6 @@ class Cluster():
         self.distanceToNeighbor = 0
         self.distanceRunningTotal = 0
     
-        #self.cityList.append([node, distance])
 
     #def addCityList(self, entry, m, x1, y1):
     def addCityList(self, val):
@@ -36,11 +28,30 @@ class Cluster():
     def replaceCityList(self, val):
         self.cityList = val 
 
-    def getIdent(self):
-        return self.ident 
+    def getClusterIdent(self):
+        return self.ident
+
+    def setNearestNeighbor(self, val):
+        self.nearestNeighbers.extend(val)
+
+    def getNearestNeighbor(self):
+        return self.nearestNeighbers
+
+    def existsNearestNeighbor(self, val):
+        if val in self.nearestNeighbers:
+            return True
+        else:
+            return False
+
+
+    def getParent(self):
+        return self.cityList[0][0]
 
     def getParentDistanceStats(self):
         return self.distanceToNeighbor, self.distanceRunningTotal
+
+    def getDistanceRunningTotal(self):
+        return self.distanceRunningTotal
 
     def setParentDistanceStats(self, toNeighbor, runTotal):
         self.distanceToNeighbor = toNeighbor
@@ -58,6 +69,9 @@ class Cluster():
     def getLastCityDistance(self):
         return int(self.cityList[-1][2])
 
+
+
+
 # input:  filename, ordered list with length
 # output: filename.tour ; 1st line "tour length: #" ; list of city ids
 #
@@ -67,47 +81,40 @@ def print_to_file(filename, length, list):
 
 
 # input: ClusterList - a list of cluster objects
-# output: a sorted list of objects using parent nodes for distance
-#           update cluster's neighbor list, 
-#           if current cluster not in neighbor list - add
+# output: - sorted list of objects using parent nodes for distance
+#         - update cluster's neighbor list, 
+#         - if current cluster not in neighbor list - add
 def neighbor_list_bruteforce(ClusterList):
     
     Cluster_Sorted = []
 
-    
-
-
-
-    #for item in clusterlist
-    #   
-
+    #Set up the Cluster_Sort: obtain starter Cluster
     if ClusterList:
+
         tmp = ClusterList.pop()
         tmp_d, tourtotal = tmp.getParentDistanceStats()
-        
-        #size of neighbors
-        list_size = len(ClusterList)
-        N_TEST = int(list_size * .15)
+         
 
-        # actively adding node to neighbor list
-        # when finished extend neighbor list in cluster
+        #   Closest Neighbors to Cluster:  NeighborList 
+        #   - Actively enter up to N_TEST neighbors
         neighbors = []
-        max_neighbor = tourtotal
+        list_size = len(ClusterList)        
+        N_TEST = int(list_size * .15)
+        max_neighbor = tourtotal 
+        n_count = 0                  
 
-        # while searching: increment when element is added
-        n_count = 0
-
-        # set values to 0
+        # set starter cluster values to 0
         tmp.setParentDistanceStats( 0, 0)
 
         Cluster_Sorted.append(tmp)
 
 
-
-
+    #   Compare every item in Cluster_Sorted to the Cluster list
+    #   - appends the closest to index 
+    #   - advances index
     for index in Cluster_Sorted:
 
-        # coordinates for the index cluster
+        # coordinates for the index in Cluster_Sorted
         x1, y1 = index.getCoord()
 
         # d_n is not needed, t1 is running total
@@ -115,7 +122,7 @@ def neighbor_list_bruteforce(ClusterList):
 
         minDistance = tourtotal
         minIndex = 0
-        counter = 0
+        counter = 0                 # used for index to extract cluster from ClusterList
 
         for runner in ClusterList:
 
@@ -125,25 +132,60 @@ def neighbor_list_bruteforce(ClusterList):
                 minIndex = counter
                 minDistance = m2
 
+
+            #   Neighborhood list
+            #
             if m2 < max_neighbor:
-
                 if n_count < N_TEST:
-                    neighbors.append([runner.getIdent, m2])
+                    neighbors.append([runner.getParent(), m2])
                     n_count+=1
-                else:
                     
+                    #print str(m2) + " >> max neighbors " + str(max_neighbor) 
+                else:
+                    #print "this is the neighbors list"
+                    z, i = max([(row[1], row) for row in neighbors])
+                    i = neighbors.index(i)          # must be a better way.
+                    neighbors[i] = [runner.getParent(), m2]
 
-            counter+=1
+                max_neighbor = max([(row[1]) for row in neighbors])
+
+            counter+=1         
+
+
 
         if ClusterList:
             tmp = ClusterList.pop(minIndex)
         
             #update                (distanceToNeighbor, distanceRunningTotal )
             tmp.setParentDistanceStats( minDistance, t1 + minDistance)
+            tmp.setNearestNeighbor(neighbors)
+
 
             Cluster_Sorted.append(tmp)
 
+
+        print neighbors
+        neighbors = []
+        max_neighbor = tourtotal
+        n_count = 0 
+
+
+
     return Cluster_Sorted
+
+#   
+#   input: The sorted cluster list
+#
+def cluster_neighbor_update(tmp, neighbors, Cluster_Sorted):
+
+    if Cluster_Sorted and neighbors:
+        for entry in neighbors:
+            for cluster in Cluster_Sorted:
+
+                if not cluster.existsNearestNeighbor(entry[0]):
+
+
+
 
 
 #calculates the nearest 3 neighbors
