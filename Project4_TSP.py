@@ -5,6 +5,7 @@ import os.path
 import random
 import operator
 
+
 #            intdex [0][n],        index[1]    ,    index[2]
 #  city_entry = [(tuple), distance to prev city, distance running total]
 class Cluster():
@@ -14,7 +15,7 @@ class Cluster():
         self.n = int(n)
         self.x = int(x)
         self.y = int(y)
-        self.nearestNeighbers = []
+        self.nearestNeighbors = []
         self.cityList = []
         self.length = 0
         self.distanceToNeighbor = 0
@@ -32,13 +33,14 @@ class Cluster():
         return self.ident
 
     def setNearestNeighbor(self, val):
-        self.nearestNeighbers.extend(val)
+        self.nearestNeighbors.extend(val)
 
     def getNearestNeighbor(self):
-        return self.nearestNeighbers
+        return self.nearestNeighbors
 
     def existsNearestNeighbor(self, val):
-        if val in [x[0] for x in self.nearestNeighbers]:
+        if self.nearestNeighbors:
+            
             return True
         else:
             return False
@@ -146,6 +148,7 @@ def neighbor_list_bruteforce(ClusterList):
                     z, i = max([(row[1], row) for row in neighbors])
                     i = neighbors.index(i)          # must be a better way.
                     neighbors[i] = [runner.getParent(), m2]
+                    print neighbors[i]
 
                 max_neighbor = max([(row[1]) for row in neighbors])
 
@@ -155,7 +158,7 @@ def neighbor_list_bruteforce(ClusterList):
 
         if ClusterList:
             tmp = ClusterList.pop(minIndex)
-            
+            print neighbors
             cluster_neighbor_update(tmp, neighbors, Cluster_Sorted)
 
             #update                (distanceToNeighbor, distanceRunningTotal )
