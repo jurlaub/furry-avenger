@@ -34,8 +34,7 @@ class Cluster():
 
     def setNearestNeighbor(self, val):
         self.nearestNeighbors = val
-        #print "-" * 45
-        #print self.nearestNeighbors.viewitems()
+
 
     def addToNearestNeighbor(self, key, val):
         self.nearestNeighbors[key] = val
@@ -86,11 +85,17 @@ def print_to_file(filename, length, list):
     pass
 
 
-# input: ClusterList - a list of cluster objects
-# output: - sorted list of objects using parent nodes for distance
-#         - update cluster's neighbor list, 
-#         - if current cluster not in neighbor list - add
+
 def neighbor_list_bruteforce(ClusterList):
+    """
+    input: ClusterList - a list of cluster objects
+    output: - sorted list of objects using parent nodes for distance
+        - update cluster's neighbor list, 
+        - if current cluster not in neighbor list - add
+
+    """
+
+
     
     Cluster_Sorted = []
 
@@ -138,8 +143,12 @@ def neighbor_list_bruteforce(ClusterList):
                 minIndex = counter
                 minDistance = m2
 
+
             #   Neighborhood list
-            #
+            #       testing to see if the values remaining in ClusterList are close
+            #       optimization decreases as ClusterList becomes smaller
+            #       only adds n_count values to list. 
+            #       then replaces max with smaller values
             if m2 < max_neighbor:
 
                 r = runner.getParent()
@@ -162,26 +171,17 @@ def neighbor_list_bruteforce(ClusterList):
 
             counter+=1         
 
-        #print ">>> max neighbor:" + str(max_neighbor)
+
 
         if Cluster_Sorted:
             Cluster_Sorted[-1].updateNearestNeighbor(neighbors)
             #print ">>> " + str(neighbors)
  
-                
-
-
-
-        if ClusterList:
-            tmp = ClusterList.pop(minIndex)
-            #cluster_neighbor_update(tmp, neighbors, Cluster_Sorted)
-            #update                (distanceToNeighbor, distanceRunningTotal )
-            tmp.setParentDistanceStats( minDistance, t1 + minDistance)
             
-            #   maybe the place to add index to tmp
-            #if tmp.getParent() in neighbors:
+        if ClusterList:
 
-
+            tmp = ClusterList.pop(minIndex)
+            tmp.setParentDistanceStats( minDistance, t1 + minDistance)
             Cluster_Sorted.append(tmp)
 
 
@@ -194,36 +194,6 @@ def neighbor_list_bruteforce(ClusterList):
 
 
     return Cluster_Sorted
-
-#   
-#   input: The sorted cluster list
-#
-# def cluster_neighbor_update(tmp, neighbors, Cluster_Sorted):
-
-#     if Cluster_Sorted and neighbors:
-#         t = tmp.getParent()
-#         x1, y1 = tmp.getCoord()
-#         print str(t) + " >>> entry parent"
-#         print neighbors
-#         for entry in neighbors:
-            
-#             print ">>> this is entry: " + str(entry)
-#             for cluster in Cluster_Sorted:
-#                 #print cluster
-#                 #print cluster.getNearestNeighbor()
-#                 z = cluster.getParent()
-
-#                 if cluster == entry and cluster.existsNearestNeighbor(t):
-
-#                     x2, y2 = cluster.getCoord()
-#                     m2 = distance(x1, y1, x2, y2) 
-#                     cluster.addToNearestNeighbor(t, m2)
-#                     print "cluster: " + str(cluster.getParent())+ "adding: " + str(t) + " dis: " + str(m2)
-#                     print cluster.getNearestNeighbor()
-#                     print "-" * 30
-#                     #print cluster.getNearestNeighbor()
-#     print " "
-
 
 
 def cluster_neighbor_update(Cluster_Sorted):
@@ -275,7 +245,18 @@ def cluster_citysort(cluster):
 
 
 
-def cluster_city_bruteforce(cluster):
+def cluster_city_bruteforce(cluster, startPoint):
+    """ 
+    Sorts within city using a greedy algorithm
+
+    input:  cluster, 
+            (starting point = last citylist entry in prior cluster)
+            last city from current cluster used if starting point is None
+    output: sorted cluster
+
+    
+
+    """
 
     cities = cluster.getCityList()
     citiesSorted = []
@@ -283,11 +264,20 @@ def cluster_city_bruteforce(cluster):
     tourtotal = cluster.getLastCityDistance()
     
 
-
-
     # obtain the last item from current cities (i.e. not parent item)
     #   place into new list in order to do the search sequence
-    if cities:
+    if startPoint is not None:
+        v = [x[0] for x in cities].index(startPoint)
+        print v
+        tmp = cities.pop(v)
+
+        #new distance 
+        x1, y1 = startPoint[1], startPoint[2]
+
+        tmp[1] = 0
+        tmp[2] = 0
+        citiesSorted.append(tmp)
+    elif cities:
         tmp = cities.pop(-1)
         tmp[1] = 0
         tmp[2] = 0
@@ -323,24 +313,66 @@ def cluster_city_bruteforce(cluster):
             citiesSorted.append(tmp)
     return citiesSorted
 
-    # for index in cities:
-    #     counter+=1
-    #     # grab item xy
-    #     x1, y1, m1 = index[0][1], index[0][2], index[1]
-    #     print str(x1) + ' ' + str(y1) + ' outer loop'
-    #     #for loop
-    #     for runner in cities[counter:]:
-    #         #print "     " + str(runner)
-    #         # if not the same find distance
-    #         x2, y2 = runner[0][1], runner[0][2]
-    #         m2 = distance(x1, y1, x2, y2) 
-    #         subtotal.append(m2)
-    #         # subtotal > tourtotal, try new option
-    #         #   continue searching
+def cluster_sequencer_find_NextNeighbor(cluster, Cluster_Sorted):
+    """
+    input: index cluster, remaining Cluster_Sorted list
+    output: next cluster: Cluster_Sorted.index of closest cluster
+
+        returns closest neighbor from nearestNeighborsList 
+        or finds new one if values in neighborlist are not present in Cluster_Sorted
+
+
+    """
+
+    nlist = cluster.getNearestNeighbor()
+
+    for item in nlist:
+        print item
+
+    # not finished.
+
+
+
+def cluster_sequencer_printNextNeighbor(cluster, Cluster_Sorted):
+    nlist = cluster.getNearestNeighbor()
+
+    for item in nlist:
+        print item
+
+
+  
+def cluster_sequencer(Cluster_Sorted):
+    """
+    input: Cluster_Sorted + updated Neighborhood list
+    output: Externally and Internally sorted list of Clusters
+
+    >>> print out == iterating through each SortedClusterSequence.cityList
+    >>> total is SortedClusterSequence[-1].cityList[-1] running total distance
+
+    """
+
+    SortedClusterSequence = []
+
+    #   obtain the first element 
+    if Cluster_Sorted:
+        tmp = Cluster_Sorted.pop()
+        tmp.replaceCityList(cluster_city_bruteforce(tmp, None))
+
+        # call findNextNeighbor
+
         
+    # Add starter cluster to SortedClusterSequence
+    #   sort internally
+
+    # obtain next cluster Cluster_Sorted index
+    # obtain closest city within cluster
+
+    # itera
 
 
 
+
+    return SortedClusterSequence
 
 def cluster_sort(cluster):
     pass
@@ -457,32 +489,31 @@ def command(filename):
 
     #call input_coords ()
     input_coords(filename, ClusterList)
-    m = 0
-    # for item in ClusterList:
-    #     m+=1
-    #     #print str(m) + " " + str(item.x) + " " + str(item.y)
-    #     print m
-    #     print item.getParentDistanceStats()
-        #print item.getCityList()
-        #item.replaceCityList(cluster_city_bruteforce(item))
 
-        #print item.getCityList()
-
-        # for entry in item.getCityList():
-        #     print entry
-        #print item.getLastCityList() 
-    #print ClusterList
 
     ClusterList = neighbor_list_bruteforce(ClusterList)
     cluster_neighbor_update(ClusterList)
-    # print ")_)(_)(_)(_)(_)(_)(_)(_)(_)(_(_"
+
+
     m = 0
     for item in ClusterList:
         m+=1
-    #     #print str(m) + " " + str(item.x) + " " + str(item.y)
-    #     print str(item.getParent()) + " "  + str(m)
-        print item.getNearestNeighbor()
-        print " "
+        print str(m) + " " + str(item.getParent())
+        item.replaceCityList(cluster_city_bruteforce(item, None))
+        #print item.getCityList()
+        #item.replaceCityList(cluster_city_bruteforce(item))
+        cluster_sequencer_find_NextNeighbor(item, ClusterList)
+
+    # ClusterList = neighbor_list_bruteforce(ClusterList)
+    # cluster_neighbor_update(ClusterList)
+
+    # m = 0
+    # for item in ClusterList:
+    #     m+=1
+    # #     #print str(m) + " " + str(item.x) + " " + str(item.y)
+    # #     print str(item.getParent()) + " "  + str(m)
+    #     print item.getNearestNeighbor()
+    #     print " "
 
 
     # call sort: neighbor and cluster
