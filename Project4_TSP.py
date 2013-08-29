@@ -374,6 +374,56 @@ def cluster_sequencer(Cluster_Sorted):
 
     return SortedClusterSequence
 
+
+def cluster_sequencer_simple(Cluster_Sorted):
+    """
+    input: Cluster_Sorted + updated Neighborhood list
+    output: Externally and Internally sorted list of Clusters
+
+    using clusters in Cluster_Sorted indexed order, 
+    connect all cities.
+
+    """
+
+    SortedClusterSequence = []
+
+    #   obtain the first element 
+    if Cluster_Sorted:
+        for cluster in Cluster_Sorted:
+            pass
+
+        # call findNextNeighbor
+
+        
+    # Add starter cluster to SortedClusterSequence
+    #   sort internally
+
+    # obtain next cluster Cluster_Sorted index
+    # obtain closest city within cluster
+
+    # itera
+
+
+
+
+    return SortedClusterSequence
+
+
+def get_closest_city(clusterA, entry):
+    """
+    input: cluster to search, entry tuple
+    output: the city in clusterA closest to tuple
+    """
+
+    cities = clusterA.getCityList()
+    x1, y1 = entry
+
+
+    for city in cities:
+        pass
+
+
+
 def cluster_sort(cluster):
     pass
 
@@ -500,7 +550,7 @@ def command(filename):
         m+=1
         print str(m) + " " + str(item.getParent())
         item.replaceCityList(cluster_city_bruteforce(item, None))
-        #print item.getCityList()
+        print item.getCityList()
         #item.replaceCityList(cluster_city_bruteforce(item))
         cluster_sequencer_find_NextNeighbor(item, ClusterList)
 
