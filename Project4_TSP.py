@@ -74,6 +74,9 @@ class Cluster():
     def getLastCityDistance(self):
         return int(self.cityList[-1][2])
 
+    def getLastCity(self):
+        return self.cityList[-1]        
+
     def getN(self):
         return self.n
 
@@ -266,22 +269,23 @@ def cluster_city_bruteforce(cluster, startPoint):
     citiesSorted = []
     subtotal = []
     tourtotal = cluster.getLastCityDistance()
-    print cluster.getCityList()
+    #print cluster.getCityList()
 
     # obtain the last item from current cities (i.e. not parent item)
     #   place into new list in order to do the search sequence
     if startPoint is not None:
-        print startPoint
-        print cities
+        #print startPoint
+        #print cities
         startTuple = startPoint[0]
 
         v = [x[0] for x in cities].index(startTuple)
-        print " At brute force starting point " + str(v) + " " + str(startPoint[1]) + " " + str(startPoint[2])
-        print cities[v]
+        #print " At brute force starting point " + str(v) + " " + str(startPoint[1]) + " " + str(startPoint[2])
+        #print cities[v]
         tmp = cities.pop(v)
 
         tmp[1] = startPoint[1]
         tmp[2] = startPoint[2]
+        #print tmp
         citiesSorted.append(tmp)
 
     elif cities:
@@ -298,6 +302,7 @@ def cluster_city_bruteforce(cluster, startPoint):
         #            intdex [0][n],        index[1]    ,    index[2]
         #  city_entry = [(tuple), distance to prev city, distance running total]
         x1, y1, t1 = int(index[0][1]), int(index[0][2]), int(index[2])
+        #print ">> city sort>> index: " + str(index)
 
         minDistance = tourtotal
         minIndex = 0
@@ -397,19 +402,27 @@ def cluster_sequencer_simple(Cluster_Sorted):
     #   obtain the first element 
     if Cluster_Sorted:
         if Cluster_Sorted[1]:
-            cityTuple, distance = get_closest_city(Cluster_Sorted[0], Cluster_Sorted[1].getParent())
+            cityTuple = get_closest_city(Cluster_Sorted[0], [Cluster_Sorted[1].getParent(), 0, 0])
             
-
-            tmp = cluster_city_bruteforce(Cluster_Sorted[0], [cityTuple, 0, 55])
-            print " this sequencer simple" + str(cityTuple) + " " + str(distance)
-            print tmp
+            tmp = cluster_city_bruteforce(Cluster_Sorted[0], cityTuple)
+            #print " this sequencer simple" + str(cityTuple) 
+            #print tmp
             Cluster_Sorted[0].replaceCityList(tmp[::-1])  #insert list in reverse order  http://stackoverflow.com/questions/3705670/best-way-to-create-a-reversed-list-in-python
 
-            SortedClusterSequence.append(Cluster_Sorted.pop(0))
-
-        for cluster in Cluster_Sorted:
-
             
+            lastCity = Cluster_Sorted[0].getLastCity()
+            #print ">>> last city " + str(lastCity)
+
+        for cluster in Cluster_Sorted[1:]:
+
+            cityTuple = get_closest_city(cluster, lastCity)
+            #print cityTuple
+            
+            cluster.replaceCityList(cluster_city_bruteforce(cluster, cityTuple))
+
+            lastCity = cluster.getLastCity()
+
+
 
             
 
@@ -437,7 +450,7 @@ def get_closest_city(clusterA, entry):
     """
 
     cities = clusterA.getCityList()
-    x1, y1 = int(entry[1]), int(entry[2])
+    x1, y1 = int(entry[0][1]), int(entry[0][2])
 
     minDistance = clusterA.getN()
     minIndex = 0
@@ -456,7 +469,7 @@ def get_closest_city(clusterA, entry):
 
     val = cities[minIndex]
 
-    return val[0], minDistance
+    return [val[0], minDistance, minDistance + entry[2]]
 
 
 
@@ -527,6 +540,38 @@ def add_Cluster_Entry(entry, ClusterList):
     return False
 
 
+def print_cities_in_clusterlist(Cluster_Sorted):
+
+    count = 0
+    for cluster in Cluster_Sorted:
+        for city in cluster.getCityList():
+            print str(count) + " " + str(city)
+            count+=1
+
+def input_coords_from_Cluster(Cluster_Sorted, n):
+
+    ClusterList = []
+
+    tmp = Cluster_Sorted[0].getCityList()
+    entry = tmp.pop()
+    if not tmp:
+        Cluster_Sorted.pop(0)
+    else:
+        Cluster_Sorted[0].replaceCityList(tmp)
+
+    entry = entry[0]
+    print entry
+
+    make_Cluster(entry, ClusterList, n)
+
+    for cluster in Cluster_Sorted:
+        for city in cluster.getCityList():
+            make_Cluster(city[0], ClusterList, n)
+
+    return ClusterList
+            
+            
+
 
 
 def input_coords(filename, ClusterList):
@@ -537,7 +582,7 @@ def input_coords(filename, ClusterList):
         #add in something to skip first line, also first character of each line (the city number)
         first = f.readline()
         n,x,y = first.strip().split(' ')
-        n_max = 2500 #(max(int(x),int(y)))
+        n_max = 5000 #(max(int(x),int(y)))
         entry = (n, x, y)
         make_Cluster(entry, ClusterList, n_max)
 
@@ -582,12 +627,12 @@ def command(filename):
     ClusterList = neighbor_list_bruteforce(ClusterList)
     cluster_neighbor_update(ClusterList)
 
-    m = 0
-    for item in ClusterList:
-        m+=1
-        print str(m) + " " + str(item.getParent())
+    # m = 0
+    # for item in ClusterList:
+    #     m+=1
+        #print str(m) + " " + str(item.getParent())
         #item.replaceCityList(cluster_city_bruteforce(item, None))
-        print item.getCityList()
+        #print item.getCityList()
         #item.replaceCityList(cluster_city_bruteforce(item))
         #cluster_sequencer_find_NextNeighbor(item, ClusterList)
 
@@ -596,6 +641,31 @@ def command(filename):
 
 
     cluster_sequencer_simple(ClusterList)
+
+    #print_cities_in_clusterlist(ClusterList)
+
+
+    print "this is the last city"
+    print ClusterList[-1].getLastCity()
+
+    input_coords_from_Cluster(ClusterList, 1000)
+
+    ClusterList = neighbor_list_bruteforce(ClusterList)
+    cluster_neighbor_update(ClusterList)
+    cluster_sequencer_simple(ClusterList)
+
+    print "this is the last city"
+    print ClusterList[-1].getLastCity()
+
+
+    input_coords_from_Cluster(ClusterList, 1000)
+
+    ClusterList = neighbor_list_bruteforce(ClusterList)
+    cluster_neighbor_update(ClusterList)
+    cluster_sequencer_simple(ClusterList)
+
+    print "this is the last city"
+    print ClusterList[-1].getLastCity()
 
     # m = 0
     # for item in ClusterList:
