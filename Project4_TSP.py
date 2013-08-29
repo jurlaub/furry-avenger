@@ -15,7 +15,7 @@ class Cluster():
         self.n = int(n)
         self.x = int(x)
         self.y = int(y)
-        self.nearestNeighbors = []
+        self.nearestNeighbors = {}
         self.cityList = []
         self.length = 0
         self.distanceToNeighbor = 0
@@ -33,17 +33,18 @@ class Cluster():
         return self.ident
 
     def setNearestNeighbor(self, val):
-        self.nearestNeighbors.extend(val)
+        self.nearestNeighbors = val
+        print "-" * 45
+        print self.nearestNeighbors.viewitems()
+
+    def addToNearestNeighbor(self, key, val):
+        self.nearestNeighbors[key] = val
 
     def getNearestNeighbor(self):
-        return self.nearestNeighbors
+        return self.nearestNeighbors.viewitems()
 
-    def existsNearestNeighbor(self, val):
-        if self.nearestNeighbors:
-            
-            return True
-        else:
-            return False
+    def existsNearestNeighbor(self, key):
+        return key in self.nearestNeighbors
 
 
     def getParent(self):
@@ -99,7 +100,7 @@ def neighbor_list_bruteforce(ClusterList):
 
         #   Closest Neighbors to Cluster:  NeighborList 
         #   - Actively enter up to N_TEST neighbors
-        neighbors = []
+        neighbors = {}
         list_size = len(ClusterList)        
         N_TEST = int(list_size * .15)
         max_neighbor = tourtotal 
@@ -134,23 +135,29 @@ def neighbor_list_bruteforce(ClusterList):
                 minIndex = counter
                 minDistance = m2
 
-
             #   Neighborhood list
             #
             if m2 < max_neighbor:
+
+                r = runner.getParent()
+                
                 if n_count < N_TEST:
-                    neighbors.append([runner.getParent(), m2])
+                    
+                    neighbors[r] = m2           # add to dictionary
                     n_count+=1
                     
-                    #print str(m2) + " >> max neighbors " + str(max_neighbor) 
+                    print str(m2) + " >> max neighbors " + str(max_neighbor) 
                 else:
-                    #print "this is the neighbors list"
-                    z, i = max([(row[1], row) for row in neighbors])
-                    i = neighbors.index(i)          # must be a better way.
-                    neighbors[i] = [runner.getParent(), m2]
-                    print neighbors[i]
+                    print "this is the neighbors list"
+                    key, val = max(neighbors.iteritems(), key=lambda x:x[1])
 
-                max_neighbor = max([(row[1]) for row in neighbors])
+                    if key:
+                        del neighbors[key]
+                    neighbors[r] = m2
+                    
+
+                max_neighbor = max(neighbors.itervalues(), key=lambda x:x)
+                print ">>> max neighbor:" + str(max_neighbor)
 
             counter+=1         
 
@@ -158,7 +165,7 @@ def neighbor_list_bruteforce(ClusterList):
 
         if ClusterList:
             tmp = ClusterList.pop(minIndex)
-            print neighbors
+            
             cluster_neighbor_update(tmp, neighbors, Cluster_Sorted)
 
             #update                (distanceToNeighbor, distanceRunningTotal )
@@ -169,8 +176,8 @@ def neighbor_list_bruteforce(ClusterList):
             Cluster_Sorted.append(tmp)
 
 
-        print neighbors
-        neighbors = []
+        print neighbors.viewitems()
+        neighbors = {}
         max_neighbor = tourtotal
         n_count = 0 
 
@@ -199,9 +206,7 @@ def cluster_neighbor_update(tmp, neighbors, Cluster_Sorted):
 
                     x2, y2 = cluster.getCoord()
                     m2 = distance(x1, y1, x2, y2) 
-                    z = [t, m2]
-                    print z
-                    cluster.setNearestNeighbor(z)
+                    cluster.addToNearestNeighbor(t, m2)
                     print cluster.getNearestNeighbor()
 
 
@@ -424,8 +429,8 @@ def command(filename):
     for item in ClusterList:
         m+=1
         #print str(m) + " " + str(item.x) + " " + str(item.y)
-        print m
-        print item.getParentDistanceStats()
+        print str(item.getParent()) + " "  + str(m)
+        # print item.getParentDistanceStats()
 
 
     # call sort: neighbor and cluster
