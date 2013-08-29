@@ -74,6 +74,9 @@ class Cluster():
     def getLastCityDistance(self):
         return int(self.cityList[-1][2])
 
+    def getN(self):
+        return self.n
+
 
 
 
@@ -250,6 +253,7 @@ def cluster_city_bruteforce(cluster, startPoint):
     Sorts within city using a greedy algorithm
 
     input:  cluster, 
+            startPoing = [tuple, distance, running total]
             (starting point = last citylist entry in prior cluster)
             last city from current cluster used if starting point is None
     output: sorted cluster
@@ -262,21 +266,24 @@ def cluster_city_bruteforce(cluster, startPoint):
     citiesSorted = []
     subtotal = []
     tourtotal = cluster.getLastCityDistance()
-    
+    print cluster.getCityList()
 
     # obtain the last item from current cities (i.e. not parent item)
     #   place into new list in order to do the search sequence
     if startPoint is not None:
-        v = [x[0] for x in cities].index(startPoint)
-        print v
+        print startPoint
+        print cities
+        startTuple = startPoint[0]
+
+        v = [x[0] for x in cities].index(startTuple)
+        print " At brute force starting point " + str(v) + " " + str(startPoint[1]) + " " + str(startPoint[2])
+        print cities[v]
         tmp = cities.pop(v)
 
-        #new distance 
-        x1, y1 = startPoint[1], startPoint[2]
-
-        tmp[1] = 0
-        tmp[2] = 0
+        tmp[1] = startPoint[1]
+        tmp[2] = startPoint[2]
         citiesSorted.append(tmp)
+
     elif cities:
         tmp = cities.pop(-1)
         tmp[1] = 0
@@ -383,14 +390,28 @@ def cluster_sequencer_simple(Cluster_Sorted):
     using clusters in Cluster_Sorted indexed order, 
     connect all cities.
 
-    """
+    """ 
 
     SortedClusterSequence = []
 
     #   obtain the first element 
     if Cluster_Sorted:
+        if Cluster_Sorted[1]:
+            cityTuple, distance = get_closest_city(Cluster_Sorted[0], Cluster_Sorted[1].getParent())
+            
+
+            tmp = cluster_city_bruteforce(Cluster_Sorted[0], [cityTuple, 0, 55])
+            print " this sequencer simple" + str(cityTuple) + " " + str(distance)
+            print tmp
+            Cluster_Sorted[0].replaceCityList(tmp[::-1])  #insert list in reverse order  http://stackoverflow.com/questions/3705670/best-way-to-create-a-reversed-list-in-python
+
+            SortedClusterSequence.append(Cluster_Sorted.pop(0))
+
         for cluster in Cluster_Sorted:
-            pass
+
+            
+
+            
 
         # call findNextNeighbor
 
@@ -406,21 +427,38 @@ def cluster_sequencer_simple(Cluster_Sorted):
 
 
 
-    return SortedClusterSequence
+    #return SortedClusterSequence
 
 
 def get_closest_city(clusterA, entry):
     """
     input: cluster to search, entry tuple
-    output: the city in clusterA closest to tuple
+    output: the city in clusterA closest to tuple, distance from tuple to city
     """
 
     cities = clusterA.getCityList()
-    x1, y1 = entry
+    x1, y1 = int(entry[1]), int(entry[2])
 
+    minDistance = clusterA.getN()
+    minIndex = 0
+    counter = 0
 
     for city in cities:
-        pass
+        
+        x2, y2 = int(city[0][1]), int(city[0][2])
+        m2 = distance(x1, y1, x2, y2) 
+
+        if(m2 <= minDistance):
+            minIndex = counter
+            minDistance = m2
+
+        counter+=1
+
+    val = cities[minIndex]
+
+    return val[0], minDistance
+
+
 
 
 
@@ -544,18 +582,20 @@ def command(filename):
     ClusterList = neighbor_list_bruteforce(ClusterList)
     cluster_neighbor_update(ClusterList)
 
-
     m = 0
     for item in ClusterList:
         m+=1
         print str(m) + " " + str(item.getParent())
-        item.replaceCityList(cluster_city_bruteforce(item, None))
+        #item.replaceCityList(cluster_city_bruteforce(item, None))
         print item.getCityList()
         #item.replaceCityList(cluster_city_bruteforce(item))
-        cluster_sequencer_find_NextNeighbor(item, ClusterList)
+        #cluster_sequencer_find_NextNeighbor(item, ClusterList)
 
     # ClusterList = neighbor_list_bruteforce(ClusterList)
     # cluster_neighbor_update(ClusterList)
+
+
+    cluster_sequencer_simple(ClusterList)
 
     # m = 0
     # for item in ClusterList:
