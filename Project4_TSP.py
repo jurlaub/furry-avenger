@@ -86,9 +86,25 @@ class Cluster():
 # input:  filename, ordered list with length
 # output: filename.tour ; 1st line "tour length: #" ; list of city ids
 #
-def print_to_file(filename, length, list):
+def print_to_file(filename, ClusterList):
 
-    pass
+    #test for filename
+    #open file name
+    # write total length at top
+    # write city number on each line
+    try:
+        filename = str(filename) + '.tour'
+        with open(filename, 'w') as f:
+            f.write('Total tour length: ' + str(ClusterList[-1].getLastCity()[2]) + '\n')
+
+            for cluster in ClusterList:
+                for city in cluster.getCityList():
+                    f.write(str(city[0][0] + '\n'))
+
+        f.close()
+    except IOError as e:
+        print 'Trouble opening a file'
+
 
 
 
@@ -666,6 +682,9 @@ def command(filename):
 
     print "this is the last city"
     print ClusterList[-1].getLastCity()
+    #print_cities_in_clusterlist(ClusterList)
+
+    print_to_file(filename, ClusterList)
 
     # m = 0
     # for item in ClusterList:
