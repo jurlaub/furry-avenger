@@ -92,6 +92,21 @@ class Cluster():
 #
 def print_to_file(filename, ClusterList):
 
+    ## this is not an awesome fix- -- it is really bad.
+    ##
+    ##
+
+    entry = ClusterList[0].getParent()
+    exit = ClusterList[-1].getLastCity()
+    exit = exit[0]
+    
+    #print entry
+    x1, y1 = entry[1], entry[2]
+    #print exit
+    x2, y2 = exit[1], exit[2]
+    m2 = distance(x1, y1, x2, y2) 
+    #print m2
+
     #test for filename
     #open file name
     # write total length at top
@@ -99,7 +114,7 @@ def print_to_file(filename, ClusterList):
     try:
         filename = str(filename) + '.tour'
         with open(filename, 'w') as f:
-            f.write(str(ClusterList[-1].getLastCityDistance()) + '\n')
+            f.write(str(ClusterList[-1].getLastCityDistance() + m2) + '\n')
 
             for cluster in ClusterList:
                 for city in cluster.getCityList():
@@ -491,7 +506,8 @@ def cluster_sequencer_simple(Cluster_Sorted):
         else:
             cityTuple = [Cluster_Sorted[0].getParent(), 0, 0]
             Cluster_Sorted[0].replaceCityList(cluster_city_bruteforce(Cluster_Sorted[0], cityTuple))
-
+            #print "sequence: after cluster sorted" 
+            #print Cluster_Sorted[0].getCityList()
 
             
 
@@ -595,8 +611,8 @@ def cluster_sort(cluster):
     pass
 
 def distance(x1, y1, x2, y2):
-    dx = x1 - x2
-    dy = y1 - y2
+    dx = float(x1) - float(x2)
+    dy = float(y1) - float(y2)
     return int(round(sqrt(dx*dx + dy*dy)))   
 
 
