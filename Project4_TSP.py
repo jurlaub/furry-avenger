@@ -99,6 +99,29 @@ def print_to_file(filename, ClusterList):
     try:
         filename = str(filename) + '.tour'
         with open(filename, 'w') as f:
+            f.write(str(ClusterList[-1].getLastCityDistance()) + '\n')
+
+            for cluster in ClusterList:
+                for city in cluster.getCityList():
+                    f.write(str(city[0][0]) +'\n')
+
+        f.close()
+    except IOError as e:
+        print 'Trouble opening a file'
+
+
+# input:  filename, ordered list with length
+# output: filename.tour ; 1st line "tour length: #" ; list of city ids
+#
+def print_to_file_test(filename, ClusterList):
+
+    #test for filename
+    #open file name
+    # write total length at top
+    # write city number on each line
+    try:
+        filename = str(filename) + '.tour'
+        with open(filename, 'w') as f:
             f.write('Total tour length: ' + str(ClusterList[-1].getLastCityDistance()) + '\n')
 
             for cluster in ClusterList:
@@ -108,8 +131,6 @@ def print_to_file(filename, ClusterList):
         f.close()
     except IOError as e:
         print 'Trouble opening a file'
-
-
 
 
 def neighbor_list_bruteforce(ClusterList):
@@ -122,8 +143,8 @@ def neighbor_list_bruteforce(ClusterList):
     """
 
     v = len(ClusterList)
-    print "---" * 13
-    print "Neighbor Bruteforce: %s" % v
+    #print "---" * 13
+    #print "Neighbor Bruteforce: %s" % v
     
     Cluster_Sorted = []
 
@@ -315,7 +336,8 @@ def cluster_city_bruteforce(cluster, startPoint):
 
         tmp[1] = startPoint[1]
         tmp[2] = startPoint[2]
-        #print tmp
+        
+        #print ">> in bruteforce: " + str(tmp)
         citiesSorted.append(tmp)
 
     elif cities:
@@ -323,6 +345,7 @@ def cluster_city_bruteforce(cluster, startPoint):
         tmp[1] = 0
         tmp[2] = 0
         citiesSorted.append(tmp)
+        #print ">> in bruteforce: (the else) " + str(tmp)
 
     
 
@@ -459,11 +482,12 @@ def cluster_sequencer_simple(Cluster_Sorted):
             for cluster in Cluster_Sorted[1:]:
 
                 cityTuple = get_closest_city(cluster, lastCity)
-                #print cityTuple
+                #print "in seqencer: lastcity: " + str(cityTuple)
                 
                 cluster.replaceCityList(cluster_city_bruteforce(cluster, cityTuple))
 
                 lastCity = cluster.getLastCity()
+                #print cluster.getCityList()
         else:
             cityTuple = [Cluster_Sorted[0].getParent(), 0, 0]
             Cluster_Sorted[0].replaceCityList(cluster_city_bruteforce(Cluster_Sorted[0], cityTuple))
@@ -520,7 +544,8 @@ def reorder_city_distance(cluster, entry):
             
             # set new x1, y1
             x1, y1 = x2, y2
-            running_total+=m2
+            running_total = running_total + m2
+            #print "reorder: m2: rt:" + str(m2) +  " " + str(running_total)
 
             #update city values
             city[1] = m2
@@ -583,6 +608,7 @@ def make_Cluster(entry, ClusterList, n):
 
     x1, y1 = int(entry[1]), int(entry[2])
     ident = int(entry[0])
+    n = int(n)
 
     s = Cluster(n, x1, y1, ident)
     s.addCityList([entry, 0, 0])
@@ -662,19 +688,19 @@ def input_coords_from_Cluster(Cluster_Sorted, n):
         entry = tmp_cities.pop()
         entry = entry[0]  # gets tuple 
 
-        print "input_coords_from_Cluster: what is tmp_cities?: %s" % tmp_cities
+        #print "input_coords_from_Cluster: what is tmp_cities?: %s" % tmp_cities
 
         if tmp_cities:
             Cluster_Sorted[-1].replaceCityList(tmp_cities)
-            print "input_coords_from_Cluster: tmp_cities rplaced last cluster cites: %s" % tmp_cities
+            #print "input_coords_from_Cluster: tmp_cities rplaced last cluster cites: %s" % tmp_cities
         else:
-            n = Cluster_Sorted.pop()
+            zz = Cluster_Sorted.pop()
 
-        print "this is the first city: %s" % str(entry)
+        #print "this is the first city: %s" % str(entry)
 
         make_Cluster(entry, ClusterList, n)
-        print ClusterList[0].getCityList()
-        print "--" * 23
+        #print ClusterList[0].getCityList()
+        #print "--" * 23
 
         for cluster in Cluster_Sorted:
             for city in cluster.getCityList():
@@ -717,7 +743,7 @@ def input_coords(filename, ClusterList):
         #add in something to skip first line, also first character of each line (the city number)
         first = f.readline()
         n, x, y = first.strip().split()
-        n_max = (max(int(x),int(y)))
+        n_max = 1000 #(max(int(x),int(y)))
 
         entry = (n, x, y)
         make_Cluster(entry, ClusterList, n_max)
@@ -766,7 +792,7 @@ def command(filename):
 
 
     ClusterList = neighbor_list_bruteforce(ClusterList)
-    #cluster_neighbor_update(ClusterList)
+    cluster_neighbor_update(ClusterList)
 
     # m = 0
     # for item in ClusterList:
@@ -784,32 +810,50 @@ def command(filename):
     cluster_sequencer_simple(ClusterList)
 
 
-    n_max = ClusterList[0].getN()
-    print ")))" * 23
-    print n_max
+    # n_max = ClusterList[0].getN()
+    # print ")))" * 23
+    # print n_max
     
-    n_max = n_max/2
-    print n_max
-    input_coords_from_Cluster(ClusterList, n_max )
 
-    print "ClusterList length: %s" % len(ClusterList)
 
-    ClusterList = neighbor_list_bruteforce(ClusterList)
-    cluster_neighbor_update(ClusterList)
-    cluster_sequencer_simple(ClusterList)
+    # n_max = int(n_max/2)
+    # print n_max
+    # ClusterList = input_coords_from_Cluster(ClusterList, n_max)
 
-    print ")))" * 23
-    print n_max
-    n_max = 5
-    print n_max
-    input_coords_from_Cluster(ClusterList, n_max )
-    print "ClusterList length: %s" % len(ClusterList)
+    # print "ClusterList length: %s" % len(ClusterList)
 
-    ClusterList = neighbor_list_bruteforce(ClusterList)
-    cluster_neighbor_update(ClusterList)
-    cluster_sequencer_simple(ClusterList)
+    # ClusterList = neighbor_list_bruteforce(ClusterList)
+    # cluster_neighbor_update(ClusterList)
+    # cluster_sequencer_simple(ClusterList)
 
-    print_cities_in_clusterlist(ClusterList)
+
+
+
+
+    # n_max = int(n_max/2)
+    # print n_max
+    # ClusterList = input_coords_from_Cluster(ClusterList, n_max)
+
+    # print "ClusterList length: %s" % len(ClusterList)
+
+    # ClusterList = neighbor_list_bruteforce(ClusterList)
+    # cluster_neighbor_update(ClusterList)
+    # cluster_sequencer_simple(ClusterList)
+
+
+
+    # print ")))" * 23
+    # print n_max
+    # n_max = 5
+    # print n_max
+    # input_coords_from_Cluster(ClusterList, n_max)
+    # print "ClusterList length: %s" % len(ClusterList)
+
+    # ClusterList = neighbor_list_bruteforce(ClusterList)
+    # cluster_neighbor_update(ClusterList)
+    # cluster_sequencer_simple(ClusterList)
+
+    #print_cities_in_clusterlist(ClusterList)
 
     print_to_file(filename, ClusterList)
 
