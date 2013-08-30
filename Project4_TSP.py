@@ -103,7 +103,7 @@ def print_to_file(filename, ClusterList):
 
             for cluster in ClusterList:
                 for city in cluster.getCityList():
-                    f.write(str(city[0][0]) +" - "+ str(city[2]) + '\n')
+                    f.write(str(city[0][0]) +" - "+ str(city[1])+" - "+ str(city[2]) + '\n')
 
         f.close()
     except IOError as e:
@@ -424,7 +424,7 @@ def cluster_sequencer_simple(Cluster_Sorted):
     if Cluster_Sorted:
         if len(Cluster_Sorted)>= 2:
             cityTuple = get_closest_city(Cluster_Sorted[0], [Cluster_Sorted[1].getParent(), 0, 0])
-            print " this sequencer simple" + str(cityTuple) 
+            #print " this sequencer simple" + str(cityTuple) 
 
 
             tmp = cluster_city_bruteforce(Cluster_Sorted[0], cityTuple)
@@ -436,16 +436,16 @@ def cluster_sequencer_simple(Cluster_Sorted):
             Cluster_Sorted[0].replaceCityList(tmp[::-1])  #insert list in reverse order  http://stackoverflow.com/questions/3705670/best-way-to-create-a-reversed-list-in-python
             
             first_city = Cluster_Sorted[0].getCityList()[0]
-            print ">>>sequence sort first city: %s" % first_city
+            #print ">>>sequence sort first city: %s" % first_city
 
             reorder_city_distance(Cluster_Sorted[0], first_city)
 
-            print Cluster_Sorted[0].getCityList()
+            #print Cluster_Sorted[0].getCityList()
 
-            print Cluster_Sorted[0].getCityList()
+            #print Cluster_Sorted[0].getCityList()
             lastCity = Cluster_Sorted[0].getLastCity()
-            print ">>> last city " + str(lastCity)
-            print "\n"
+            #print ">>> last city " + str(lastCity)
+            #print "\n"
 
             for cluster in Cluster_Sorted[1:]:
 
@@ -496,7 +496,7 @@ def reorder_city_distance(cluster, entry):
 
         if entry[0] == cities[0][0]:
             running_total = 0
-            print "reorder_city_distance: %s" %running_total
+            #print "reorder_city_distance: %s" %running_total
         else:
             running_total = entry[2]
 
@@ -665,7 +665,7 @@ def input_coords(filename, ClusterList):
         #add in something to skip first line, also first character of each line (the city number)
         first = f.readline()
         n, x, y = first.strip().split(' ')
-        n_max =  5000#(max(int(x),int(y)))
+        n_max =  2500#(max(int(x),int(y)))
         entry = (n, x, y)
         make_Cluster(entry, ClusterList, n_max)
 
