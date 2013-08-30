@@ -76,7 +76,10 @@ class Cluster():
         return int(self.cityList[-1][2])
 
     def getLastCity(self):
-        return self.cityList[-1]        
+        return self.cityList[-1]    
+
+    def getFirstCity(self):
+        return self.cityList[0]    
 
     def getN(self):
         return self.n
@@ -421,15 +424,28 @@ def cluster_sequencer_simple(Cluster_Sorted):
     if Cluster_Sorted:
         if len(Cluster_Sorted)>= 2:
             cityTuple = get_closest_city(Cluster_Sorted[0], [Cluster_Sorted[1].getParent(), 0, 0])
-            
+            print " this sequencer simple" + str(cityTuple) 
+
+
             tmp = cluster_city_bruteforce(Cluster_Sorted[0], cityTuple)
             #print " this sequencer simple" + str(cityTuple) 
-            #print tmp
-            Cluster_Sorted[0].replaceCityList(tmp[::-1])  #insert list in reverse order  http://stackoverflow.com/questions/3705670/best-way-to-create-a-reversed-list-in-python
 
+
+            # works verified jiu 20130829
+            # --- bug: uses distance from closest city as distance
+            Cluster_Sorted[0].replaceCityList(tmp[::-1])  #insert list in reverse order  http://stackoverflow.com/questions/3705670/best-way-to-create-a-reversed-list-in-python
             
+            first_city = Cluster_Sorted[0].getCityList()[0]
+            print ">>>sequence sort first city: %s" % first_city
+
+            reorder_city_distance(Cluster_Sorted[0], first_city)
+
+            print Cluster_Sorted[0].getCityList()
+
+            print Cluster_Sorted[0].getCityList()
             lastCity = Cluster_Sorted[0].getLastCity()
-            #print ">>> last city " + str(lastCity)
+            print ">>> last city " + str(lastCity)
+            print "\n"
 
             for cluster in Cluster_Sorted[1:]:
 
@@ -463,6 +479,50 @@ def cluster_sequencer_simple(Cluster_Sorted):
     #return SortedClusterSequence
 
 
+
+def reorder_city_distance(cluster, entry):
+    '''
+    input: cluster with cities to reorder, city to base from 
+    output: corrects distance 
+
+    >>>for first cluster city ==> send in first city
+    '''
+    
+    cities = cluster.getCityList()
+
+    if cities:
+        #set first city (index 0) values from entry distance and running total
+        x1, y1 = int(entry[0][1]), int(entry[0][2])
+
+        if entry[0] == cities[0][0]:
+            running_total = 0
+            print "reorder_city_distance: %s" %running_total
+        else:
+            running_total = entry[2]
+
+
+        # cities[0][1] = m2
+        # cities[0][2] = entry[2] + m2
+
+        for city in cities:
+            
+            x2, y2 = int(city[0][1]), int(city[0][2])
+            m2 = distance(x1, y1, x2, y2) 
+            
+            # set new x1, y1
+            x1, y1 = x2, y2
+            running_total+=m2
+
+            #update city values
+            city[1] = m2
+            city[2] = running_total
+
+        cluster.replaceCityList(cities) 
+        print ">>reorder - cities: %s " % cluster.getCityList()
+
+
+
+
 def get_closest_city(clusterA, entry):
     """
     input: cluster to search, entry tuple
@@ -488,8 +548,10 @@ def get_closest_city(clusterA, entry):
         counter+=1
 
     val = cities[minIndex]
+    c = [val[0], minDistance, minDistance + entry[2]]
+    print "get_closest_city- return: %s\n" % c
 
-    return [val[0], minDistance, minDistance + entry[2]]
+    return c
 
 
 
