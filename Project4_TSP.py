@@ -582,7 +582,10 @@ def get_closest_city(clusterA, entry):
     cities = clusterA.getCityList()
     x1, y1 = int(entry[0][1]), int(entry[0][2])
 
-    minDistance = clusterA.getN()
+
+    # CHANGE: to a dynamically assigned variable
+    # distance between cities or ibid *2 ?
+    minDistance = 100000 #change hard number # using:  clusterA.getN()  ++> causes bug when n is small
     minIndex = 0
     counter = 0
 
