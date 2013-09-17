@@ -1,4 +1,4 @@
 furry-avenger
 =============
 
-Travelling Sales Person: an exploritory approach.
+Travelling Sales Person: an exploratory approach.
